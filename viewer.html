@@ -382,7 +382,12 @@ function completeGlycosidicBonds() {
 }
 // 構造データ(インラインCIF - オフライン/iPad対応)
 function loadStructure() {
-  const cifData = document.getElementById('mol-data').textContent;
+  const el = document.getElementById('mol-data');
+  if (!el) {
+    console.error('mol-data script tag not found');
+    return;
+  }
+  const cifData = el.textContent;
   viewer.addModel(cifData, 'cif');
   completeGlycosidicBonds();
   render();
@@ -390,7 +395,12 @@ function loadStructure() {
   viewer.zoom(1.15, 0);
   viewer.resize();
 }
-loadStructure();
+// DOM(末尾の <script type="text/plain" id="mol-data"> を含む)が完全に読み込まれてから実行
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadStructure);
+} else {
+  loadStructure();
+}
 
 // ===== チャート描画 =====
 function fitCanvas(canvas) {
